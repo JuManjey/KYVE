@@ -1,0 +1,32 @@
+# Create wallet https://metamask.io/
+# Connect to Moonbase Alfa https://docs.moonbeam.network/tokens/connect/metamask/
+# Connect wallet to https://app.kyve.network/
+sudo apt update
+curl https://deb.nodesource.com/setup_16.x | sudo bash
+sudo apt install -y nodejs gcc g++ make git < "/dev/null"
+curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/yarnkey.gpg >/dev/null
+echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+sudo apt update && sudo apt install yarn
+##################################################################
+# if you don't have docker 
+curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh
+##################################################################
+KYVE_POOL_ADDRESS="0x464200b29738367366FDb4c45f3b8fb582AE0Bf8"
+STAKE=600
+KYVE_PRIVATE_KEY="COPY_SECRET_KEY_FROM_METAMASK_ETHEREUM_WALLET"
+docker create --name kyve-evm-node --restart=always kyve/evm:latest --pool $KYVE_POOL_ADDRESS --private-key $KYVE_PRIVATE_KEY --stake $STAKE
+docker start kyve-evm-node
+
+# Check the status of container
+docker logs kyve-evm-node -f --tail=50
+
+# Update
+KYVE_POOL_ADDRESS="0x464200b29738367366FDb4c45f3b8fb582AE0Bf8"
+STAKE=600
+KYVE_PRIVATE_KEY="COPY_SECRET_KEY_FROM_METAMASK_ETHEREUM_WALLET"
+
+docker stop kyve-evm-node
+docker rm kyve-evm-node
+docker pull kyve/evm:latest
+docker create --name kyve-evm-node --restart=always kyve/evm:latest --pool $KYVE_POOL_ADDRESS --private-key $KYVE_PRIVATE_KEY --stake $STAKE
+docker start kyve-evm-node
